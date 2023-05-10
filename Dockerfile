@@ -7,4 +7,4 @@ WORKDIR /app
 
 COPY requirements.txt /app/
 RUN pip install -r requirements.txt
-COPY ./Blog/ /app/
+COPY ./core/ /app/
