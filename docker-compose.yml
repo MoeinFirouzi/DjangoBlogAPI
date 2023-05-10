@@ -1,0 +1,10 @@
+version: '3.9'
+services:
+  backend:
+    build: .
+    container_name: blog-backend
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./Blog:/app
+    ports:
+      - 8000:8000
