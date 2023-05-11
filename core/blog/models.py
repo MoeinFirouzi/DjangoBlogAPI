@@ -21,7 +21,7 @@ class Author(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     register_time = models.DateTimeField(auto_now_add=True)
     company = models.CharField(max_length=255, null=True)
-    address = models.TextField(null=True)
+    address = models.TextField(blank=True)
 
     def __str__(self) -> str:
         return self.user.username
