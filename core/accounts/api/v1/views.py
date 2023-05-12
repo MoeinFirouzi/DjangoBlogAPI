@@ -1,7 +1,11 @@
-from accounts.api.v1.serializers import AuthTokenSerializer
+from accounts.api.v1.serializers import AuthTokenSerializer, UserRegisterSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.response import Response
+from rest_framework.generics import CreateAPIView
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class CustomObtainAuthToken(ObtainAuthToken):
@@ -25,3 +29,9 @@ class CustomObtainAuthToken(ObtainAuthToken):
         user = serializer.validated_data["user"]
         token, created = Token.objects.get_or_create(user=user)
         return Response({"token": token.key, "user_id": user.id, "email": user.email})
+
+
+class UserRegister(CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserRegisterSerializer
+    

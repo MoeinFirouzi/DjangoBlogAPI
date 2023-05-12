@@ -1,42 +1,71 @@
 from django.contrib.auth import authenticate
 from django.utils.translation import gettext_lazy as _
-
 from rest_framework import serializers
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class AuthTokenSerializer(serializers.Serializer):
-    email = serializers.CharField(
-        label=_("Email"),
-        write_only=True
-    )
+    email = serializers.CharField(label=_("Email"), write_only=True)
     password = serializers.CharField(
         label=_("Password"),
-        style={'input_type': 'password'},
+        style={"input_type": "password"},
         trim_whitespace=False,
-        write_only=True
+        write_only=True,
     )
-    token = serializers.CharField(
-        label=_("Token"),
-        read_only=True
-    )
+    token = serializers.CharField(label=_("Token"), read_only=True)
 
     def validate(self, attrs):
-        username = attrs.get('email')
-        password = attrs.get('password')
+        username = attrs.get("email")
+        password = attrs.get("password")
 
         if username and password:
-            user = authenticate(request=self.context.get('request'),
-                                username=username, password=password)
+            user = authenticate(
+                request=self.context.get("request"),
+                username=username,
+                password=password,
+            )
 
             # The authenticate call simply returns None for is_active=False
             # users. (Assuming the default ModelBackend authentication
             # backend.)
             if not user:
-                msg = _('Unable to log in with provided credentials.')
-                raise serializers.ValidationError(msg, code='authorization')
+                msg = _("Unable to log in with provided credentials.")
+                raise serializers.ValidationError(msg, code="authorization")
         else:
             msg = _('Must include "username" and "password".')
-            raise serializers.ValidationError(msg, code='authorization')
+            raise serializers.ValidationError(msg, code="authorization")
 
-        attrs['user'] = user
+        attrs["user"] = user
         return attrs
+
+
+class UserRegisterSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(max_length=255, write_only=True)
+    password2 = serializers.CharField(max_length=255, write_only=True)
+
+    class Meta:
+        model = User
+        fields = ["email", "username", "password", "password2"]
+
+    def validate(self, attrs):
+        if attrs["password"] != attrs["password2"]:
+            raise serializers.ValidationError(
+                {"password": "Password fields didn't match."}
+            )
+
+        return attrs
+
+    def create(self, validated_data):
+        if User.objects.filter(email=validated_data.get("email")).exists():
+            raise serializers.ValidationError({"error": "Email already exists"})
+
+        user = User.objects.create_user(
+            email=validated_data.get("email"),
+            username=validated_data.get("username"),
+            password=validated_data.get("password"),
+        )
+
+        return user
