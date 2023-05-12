@@ -2,6 +2,7 @@ from django.contrib.auth import authenticate
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from accounts.models import Author
 
 User = get_user_model()
 
@@ -69,3 +70,32 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         )
 
         return user
+
+
+class AuthorSerializer(serializers.ModelSerializer):
+    """
+    This module contains a serializer for the Author model.
+
+    def create(self, validated_data):
+        This method creates a new Author instance with the given validated data.
+        If an author with the same user already exists, it raises a validation error.
+        Otherwise, it creates a new author with the given data and returns it.
+    """
+
+    class Meta:
+        model = Author
+        fields = "__all__"
+        read_only_fields = ["user"]
+
+    def create(self, validated_data):
+        validated_data["user"] = self.context.get("request").user
+        author, created = Author.objects.get_or_create(user=validated_data["user"])
+        if created:
+            author.company = validated_data["company"]
+            author.address = validated_data["address"]
+            author.save()
+
+            return author
+
+        else:
+            raise serializers.ValidationError({"error": "Author already exists"})

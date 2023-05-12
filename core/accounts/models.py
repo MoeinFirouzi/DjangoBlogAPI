@@ -59,7 +59,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class Author(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, unique=True)
     register_time = models.DateTimeField(auto_now_add=True)
     company = models.CharField(max_length=255, null=True)
     address = models.TextField(blank=True)

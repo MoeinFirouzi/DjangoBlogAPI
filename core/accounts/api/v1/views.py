@@ -1,9 +1,16 @@
-from accounts.api.v1.serializers import AuthTokenSerializer, UserRegisterSerializer
+from accounts.api.v1.serializers import (
+    AuthTokenSerializer,
+    UserRegisterSerializer,
+    AuthorSerializer,
+)
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.response import Response
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, ListCreateAPIView
 from django.contrib.auth import get_user_model
+from accounts.models import Author
+from rest_framework.permissions import IsAuthenticated
+from accounts.api.v1.permissions import SuperuserGetAuthenticatedPostPermission
 
 User = get_user_model()
 
@@ -34,4 +41,18 @@ class CustomObtainAuthToken(ObtainAuthToken):
 class UserRegister(CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserRegisterSerializer
-    
+
+
+class AuthorRegister(ListCreateAPIView):
+    """
+    AuthorRegister is a view that allows authenticated users to register
+    as authors. It uses the AuthorSerializer to create or retrieve an
+    Author instance associated with the user making the request.
+    If the user is already registered as an author, it raises
+    a ValidationError. This view can only be accessed by authenticated
+    users for POST requests and superusers for GET requests, as determined
+    by the SuperuserGetAuthenticatedPostPermission permission class.
+    """
+    queryset = Author.objects.all()
+    serializer_class = AuthorSerializer
+    permission_classes = [SuperuserGetAuthenticatedPostPermission]
