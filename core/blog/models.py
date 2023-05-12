@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from accounts.models import Author
+from django.urls import reverse
 
 User = get_user_model()
 
@@ -15,3 +16,6 @@ class Post(models.Model):
 
     def __str__(self) -> str:
         return self.title
+
+    def get_absolute_url(self):
+        return reverse("blog:api-v1:post-detail", kwargs={"pk": self.pk})
