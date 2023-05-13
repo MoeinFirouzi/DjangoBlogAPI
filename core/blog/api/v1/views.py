@@ -2,7 +2,7 @@ from rest_framework.viewsets import ModelViewSet
 from blog.models import Post
 from blog.api.v1.serializers import PostSerializer
 from blog.api.v1.permissions import AuthorOrSuperuserWritePermission
-
+from blog.api.v1.paginations import PostPagination
 
 class PostViewSet(ModelViewSet):
     """
@@ -25,3 +25,4 @@ class PostViewSet(ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = [AuthorOrSuperuserWritePermission]
+    pagination_class = PostPagination
