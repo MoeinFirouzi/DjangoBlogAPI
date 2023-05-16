@@ -6,11 +6,18 @@ from accounts.api.v1.serializers import (
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.response import Response
-from rest_framework.generics import CreateAPIView, ListCreateAPIView
+from rest_framework.generics import (
+    CreateAPIView,
+    ListCreateAPIView,
+    RetrieveUpdateDestroyAPIView,
+)
 from django.contrib.auth import get_user_model
 from accounts.models import Author
 from rest_framework.permissions import IsAuthenticated
-from accounts.api.v1.permissions import SuperuserGetAuthenticatedPostPermission
+from accounts.api.v1.permissions import (
+    SuperuserGetAuthenticatedPostPermission,
+    SuperuserOrOwner,
+)
 
 User = get_user_model()
 
@@ -53,6 +60,18 @@ class AuthorRegister(ListCreateAPIView):
     users for POST requests and superusers for GET requests, as determined
     by the SuperuserGetAuthenticatedPostPermission permission class.
     """
+
     queryset = Author.objects.all()
     serializer_class = AuthorSerializer
     permission_classes = [SuperuserGetAuthenticatedPostPermission]
+
+
+class AuthorDetail(RetrieveUpdateDestroyAPIView):
+    """
+    This class represents the view for retrieving, updating and
+    deleting an Author object.
+    """
+
+    queryset = Author.objects.all()
+    serializer_class = AuthorSerializer
+    permission_classes = [SuperuserOrOwner]

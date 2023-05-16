@@ -15,3 +15,15 @@ class SuperuserGetAuthenticatedPostPermission(permissions.BasePermission):
             return request.user.is_authenticated
 
         return False
+
+
+class SuperuserOrOwner(permissions.BasePermission):
+    """
+    SuperuserOrOwner allows access to an object only if the user making
+    the request is either a superuser or the owner of the object.
+    """
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return (request.user == obj.user) or (request.user.is_superuser)
+        else:
+            return request.user == obj.user
