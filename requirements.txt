@@ -3,3 +3,4 @@ djangorestframework==3.14
 markdown
 django-filter 
 environs==9.5
+drf-yasg
