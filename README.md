@@ -17,7 +17,7 @@ redoc/
 
 ### To Download Snippets API
 ```
-swagger/output.json"
+swagger/output.json
 ```
 
 ## License
