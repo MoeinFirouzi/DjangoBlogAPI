@@ -6,6 +6,8 @@ from accounts.api.v1.serializers import (
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework import status
 from rest_framework.generics import (
     CreateAPIView,
     ListCreateAPIView,
@@ -48,6 +50,23 @@ class CustomObtainAuthToken(ObtainAuthToken):
 class UserRegister(CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserRegisterSerializer
+
+
+class CustomDiscardAuthToken(APIView):
+    """
+    This class represents an API view for discarding the authentication
+    token of a user.
+
+    Methods:
+        post(request): Deletes the authentication token of the authenticated
+        user and returns a response with status code 204.
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def post(sef, request):
+        request.user.auth_token.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class AuthorRegister(ListCreateAPIView):
