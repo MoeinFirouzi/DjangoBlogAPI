@@ -4,3 +4,4 @@ markdown
 django-filter 
 environs==9.5
 drf-yasg
+djangorestframework-simplejwt
