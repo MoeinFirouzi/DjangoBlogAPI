@@ -3,6 +3,8 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from accounts.models import Author
+from django.contrib.auth.password_validation import validate_password
+from rest_framework.exceptions import ValidationError
 
 User = get_user_model()
 
@@ -99,3 +101,21 @@ class AuthorSerializer(serializers.ModelSerializer):
 
         else:
             raise serializers.ValidationError({"error": "Author already exists"})
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+    new_password2 = serializers.CharField(required=True)
+    
+    def validate(self, attrs):
+        if attrs["new_password"] != attrs["new_password2"]:
+            raise serializers.ValidationError(
+                {"password": "Password fields didn't match."}
+            )
+        try:
+            validate_password(attrs["new_password"])
+        except ValidationError as e:
+            raise serializers.ValidationError({"new_password": list(e.messages)})
+
+        return super().validate(attrs)

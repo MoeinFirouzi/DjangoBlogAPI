@@ -2,6 +2,7 @@ from accounts.api.v1.serializers import (
     AuthTokenSerializer,
     UserRegisterSerializer,
     AuthorSerializer,
+    ChangePasswordSerializer,
 )
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -12,6 +13,7 @@ from rest_framework.generics import (
     CreateAPIView,
     ListCreateAPIView,
     RetrieveUpdateDestroyAPIView,
+    GenericAPIView,
 )
 from django.contrib.auth import get_user_model
 from accounts.models import Author
@@ -94,3 +96,42 @@ class AuthorDetail(RetrieveUpdateDestroyAPIView):
     queryset = Author.objects.all()
     serializer_class = AuthorSerializer
     permission_classes = [SuperuserOrOwner]
+
+
+class ChangePassword(GenericAPIView):
+    """
+    This module allows authenticated users to change their password.
+    """
+
+    model = User
+    permission_classes = [IsAuthenticated]
+    serializer_class = ChangePasswordSerializer
+
+    def get_object(self):
+        return self.request.user
+
+    def put(self, request, *args, **kwargs):
+        """
+        Handles PUT requests to change the user's password.
+        Validates the request data,checks if old password is correct,
+        sets new password and saves it. Returns a success or error response.
+
+        """
+        instance = self.get_object()
+        self.object = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            # Check old password
+            if not self.object.check_password(serializer.data.get("old_password")):
+                return Response(
+                    {"old_password": ["wrong password."]},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            self.object.set_password(serializer.data.get("new_password"))
+            self.object.save()
+            return Response(
+                {"details": "password changed successfully"}, status=status.HTTP_200_OK
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

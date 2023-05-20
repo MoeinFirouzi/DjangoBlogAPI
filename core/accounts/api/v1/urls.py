@@ -5,6 +5,7 @@ from accounts.api.v1.views import (
     AuthorRegister,
     AuthorDetail,
     CustomDiscardAuthToken,
+    ChangePassword,
 )
 
 app_name = "account-api-v1"
@@ -15,4 +16,5 @@ urlpatterns = [
     path("logout/", CustomDiscardAuthToken.as_view(), name="user-logout"),
     path("author/", AuthorRegister.as_view(), name="author-register"),
     path("author/<int:pk>/", AuthorDetail.as_view(), name="author-detail"),
+    path("change_password/", ChangePassword.as_view(), name="change-user-password"),
 ]
