@@ -63,7 +63,9 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         if User.objects.filter(email=validated_data.get("email")).exists():
-            raise serializers.ValidationError({"error": "Email already exists"})
+            raise serializers.ValidationError(
+                {"error": "Email already exists"}
+            )
 
         user = User.objects.create_user(
             email=validated_data.get("email"),
@@ -91,7 +93,9 @@ class AuthorSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data["user"] = self.context.get("request").user
-        author, created = Author.objects.get_or_create(user=validated_data["user"])
+        author, created = Author.objects.get_or_create(
+            user=validated_data["user"]
+        )
         if created:
             author.company = validated_data["company"]
             author.address = validated_data["address"]
@@ -100,14 +104,16 @@ class AuthorSerializer(serializers.ModelSerializer):
             return author
 
         else:
-            raise serializers.ValidationError({"error": "Author already exists"})
+            raise serializers.ValidationError(
+                {"error": "Author already exists"}
+            )
 
 
 class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
     new_password2 = serializers.CharField(required=True)
-    
+
     def validate(self, attrs):
         if attrs["new_password"] != attrs["new_password2"]:
             raise serializers.ValidationError(
@@ -116,6 +122,8 @@ class ChangePasswordSerializer(serializers.Serializer):
         try:
             validate_password(attrs["new_password"])
         except ValidationError as e:
-            raise serializers.ValidationError({"new_password": list(e.messages)})
+            raise serializers.ValidationError(
+                {"new_password": list(e.messages)}
+            )
 
         return super().validate(attrs)

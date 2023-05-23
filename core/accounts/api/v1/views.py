@@ -46,7 +46,9 @@ class CustomObtainAuthToken(ObtainAuthToken):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data["user"]
         token, created = Token.objects.get_or_create(user=user)
-        return Response({"token": token.key, "user_id": user.id, "email": user.email})
+        return Response(
+            {"token": token.key, "user_id": user.id, "email": user.email}
+        )
 
 
 class UserRegister(CreateAPIView):
@@ -117,13 +119,14 @@ class ChangePassword(GenericAPIView):
         sets new password and saves it. Returns a success or error response.
 
         """
-        instance = self.get_object()
         self.object = self.get_object()
         serializer = self.get_serializer(data=request.data)
 
         if serializer.is_valid():
             # Check old password
-            if not self.object.check_password(serializer.data.get("old_password")):
+            if not self.object.check_password(
+                serializer.data.get("old_password")
+            ):
                 return Response(
                     {"old_password": ["wrong password."]},
                     status=status.HTTP_400_BAD_REQUEST,
@@ -132,6 +135,7 @@ class ChangePassword(GenericAPIView):
             self.object.set_password(serializer.data.get("new_password"))
             self.object.save()
             return Response(
-                {"details": "password changed successfully"}, status=status.HTTP_200_OK
+                {"details": "password changed successfully"},
+                status=status.HTTP_200_OK,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

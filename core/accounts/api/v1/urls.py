@@ -1,4 +1,4 @@
-from django.urls import path, include
+from django.urls import path
 from accounts.api.v1.views import (
     CustomObtainAuthToken,
     UserRegister,
@@ -16,5 +16,9 @@ urlpatterns = [
     path("logout/", CustomDiscardAuthToken.as_view(), name="user-logout"),
     path("author/", AuthorRegister.as_view(), name="author-register"),
     path("author/<int:pk>/", AuthorDetail.as_view(), name="author-detail"),
-    path("change_password/", ChangePassword.as_view(), name="change-user-password"),
+    path(
+        "change_password/",
+        ChangePassword.as_view(),
+        name="change-user-password",
+    ),
 ]
