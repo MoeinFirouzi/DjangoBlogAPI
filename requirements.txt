@@ -7,3 +7,5 @@ drf-yasg
 djangorestframework-simplejwt
 black
 flake8
+pytest
+pytest-django
