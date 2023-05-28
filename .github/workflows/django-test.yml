@@ -14,5 +14,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Test Output
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+    - name: Setup Docker Compose
+      run: docker compose uo -d
+    - name: Run Test
+      run: docker compose exec backend sh -c "pytest ."
